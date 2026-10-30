@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>The Continuum Questionnaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e9ebe6;
+    --card: #f6f7f3;
+    --accent: #6f8466;
+    --accent-strong: #5a6d52;
+    --accent-soft: #dfe5da;
+    --heading: #4d6575;
+    --text: #26302b;
+    --muted: #55605a;
+    --line: #d3d8cf;
+    --field: #ffffff;
+    --on-accent: #ffffff;
+    --error-bg: #f3e6df;
+    --error-line: #b9806a;
+    --focus: #4d6575;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b201d;
+      --card: #242b27;
+      --accent: #9db391;
+      --accent-strong: #b3c6a8;
+      --accent-soft: #2f3a31;
+      --heading: #a9c0cf;
+      --text: #e2e6df;
+      --muted: #aab3ac;
+      --line: #3a443e;
+      --field: #1e2421;
+      --on-accent: #17201a;
+      --error-bg: #3a2c26;
+      --error-line: #c99a86;
+      --focus: #a9c0cf;
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+  html.large-text { font-size: 118.75%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 300;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    letter-spacing: 0.005em;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  p, li, label, .hint { max-width: 65ch; }
+  h1, h2, h3 { color: var(--heading); font-weight: 400; line-height: 1.3; margin: 0; }
+  h1 { font-size: clamp(2rem, 6vw, 2.75rem); letter-spacing: 0.01em; }
+  h2 { font-size: 1.5rem; }
+  strong { font-weight: 500; }
+  a { color: var(--heading); text-underline-offset: 0.2em; }
+
+  :focus { outline: none; }
+  :focus-visible, input:focus, textarea:focus {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+  h1:focus, h2:focus { outline: none; }
+  h2:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 4px; }
+
+  .topbar { display: flex; justify-content: flex-end; margin-bottom: 1.5rem; }
+  .eyebrow {
+    font-size: 0.8125rem; font-weight: 400; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--accent-strong); margin: 0 0 0.5rem;
+  }
+  header .intro p { margin: 1rem 0 0; }
+
+  .facts {
+    list-style: none; padding: 0; margin: 2rem 0 0;
+    display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  }
+  .facts li {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 0.875rem 1rem; line-height: 1.5; font-size: 0.9375rem;
+  }
+  .facts .label { display: block; color: var(--heading); font-weight: 400; margin-bottom: 0.25rem; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 1.75rem 1.25rem; margin-top: 2.5rem;
+  }
+  @media (min-width: 40rem) { .card { padding: 2.25rem 2.5rem; } }
+
+  .progress-text { font-size: 0.9375rem; color: var(--muted); margin: 0 0 0.5rem; }
+  .progress { height: 6px; background: var(--accent-soft); border-radius: 3px; overflow: hidden; margin-bottom: 2rem; }
+  .progress span { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width 300ms ease; }
+
+  .section-intro { color: var(--muted); margin: 0.5rem 0 0; }
+  .q { margin-top: 2rem; }
+  .q label { display: block; font-weight: 400; }
+  .qnum { color: var(--accent-strong); font-weight: 500; margin-right: 0.35em; }
+  .hint { display: block; font-size: 0.9375rem; color: var(--muted); margin: 0.25rem 0 0; }
+  textarea {
+    display: block; width: 100%; margin-top: 0.625rem; min-height: 7.5rem; resize: vertical;
+    font: inherit; font-weight: 300; line-height: 1.6; color: var(--text);
+    background: var(--field); border: 1px solid var(--line); border-radius: 10px; padding: 0.75rem 0.875rem;
+  }
+
+  .consent { margin-top: 1.5rem; display: grid; gap: 1rem; }
+  .check {
+    display: flex; gap: 0.875rem; align-items: flex-start;
+    background: var(--field); border: 1px solid var(--line); border-radius: 10px; padding: 0.875rem 1rem;
+    cursor: pointer;
+  }
+  .check input { width: 1.375rem; height: 1.375rem; margin: 0.2rem 0 0; flex: none; accent-color: var(--accent); cursor: pointer; }
+
+  .nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+  .nav .spacer { flex: 1; }
+  button {
+    font: inherit; font-weight: 400; font-size: 1rem; line-height: 1.4;
+    border-radius: 999px; padding: 0.75rem 1.5rem; cursor: pointer;
+    border: 1px solid var(--accent); transition: background-color 150ms ease;
+  }
+  .btn-primary { background: var(--accent); color: var(--on-accent); }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-strong); }
+  .btn-secondary { background: transparent; color: var(--text); border-color: var(--line); }
+  .btn-secondary:hover:not(:disabled) { background: var(--accent-soft); }
+  .btn-quiet { background: transparent; border: none; padding: 0.5rem 0; color: var(--muted); text-decoration: underline; text-underline-offset: 0.2em; border-radius: 4px; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+  .nav-note { font-size: 0.875rem; color: var(--muted); margin: 1rem 0 0; }
+
+  .notice { margin-top: 1.5rem; padding: 1rem 1.25rem; border-radius: 10px; border: 1px solid var(--error-line); background: var(--error-bg); }
+  .notice p { margin: 0 0 0.75rem; }
+  .notice .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  .saved-note { font-size: 0.875rem; color: var(--muted); margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .saved-note p { margin: 0; }
+  .clear-confirm { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-top: 0.5rem; }
+
+  .support { margin-top: 1.5rem; padding: 1rem 1.25rem; border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 10px 10px 0; }
+  .support p { margin: 0; }
+
+  .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  footer { margin-top: 2.5rem; font-size: 0.875rem; color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <button type="button" id="text-toggle" class="btn-secondary toggle" aria-pressed="false">Larger text</button>
+  </div>
+
+  <header>
+    <p class="eyebrow">INDE4003 Senior Thesis · Georgian College · Interior Design</p>
+    <h1>The Continuum</h1>
+    <div class="intro">
+      <p>Hi, I'm Josie Koenigs, a final-year Interior Design student at Georgian College. For my thesis I'm designing The Continuum, a community centre in the Barrie–Springwater area for neurodivergent adults.</p>
+      <p>Most buildings are designed without asking autistic and neurodivergent people what works for them. I don't want to guess. These questions are about spaces, words, school, community and the move into adulthood, and your answers will directly shape the design.</p>
+      <p>There are no right answers. Short answers, lists and "I don't know" are all useful.</p>
+    </div>
+    <ul class="facts">
+      <li><span class="label">Time</span>About 20–30 minutes.</li>
+      <li><span class="label">Your choice</span>Every question is optional. Skip anything, stop any time.</li>
+      <li><span class="label">Privacy</span>Fully anonymous. No names, emails or contact details are collected.</li>
+      <li><span class="label">Who sees it</span>Only Josie and her faculty advisor, Vanessa Simpson.</li>
+    </ul>
+  </header>
+
+  <main class="card" id="main">
+    <noscript><p>This questionnaire needs JavaScript turned on to work. Please turn it on, or try a different browser.</p></noscript>
+
+    <form id="survey" novalidate>
+      <p class="progress-text" id="progress-text" aria-live="polite"></p>
+      <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+      <div id="steps"></div>
+
+      <div class="hp" aria-hidden="true">
+        <label for="website">Leave this field empty</label>
+        <input type="text" id="website" name="_gotcha" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div id="send-error" class="notice" role="alert" hidden>
+        <p><strong>Your answers didn't send.</strong> This is a problem on my end, not yours. Your answers are still saved on this device, so you can try again later.</p>
+        <p>You can also copy your answers to keep them safe. If you'd like, you can paste them into an email to josiekoenigs@gmail.com, but an email from your account would not be anonymous.</p>
+        <div class="actions">
+          <button type="button" class="btn-primary" id="retry">Try sending again</button>
+          <button type="button" class="btn-secondary" id="copy">Copy all my answers</button>
+        </div>
+        <p id="copy-status" aria-live="polite" style="margin:0.75rem 0 0"></p>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn-secondary" id="back">Back</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn-primary" id="next">Next</button>
+      </div>
+      <p class="nav-note" id="consent-note">Tick both boxes above to continue.</p>
+
+      <div class="saved-note">
+        <p>Your answers are saved on this device as you type, so you can close this page and come back later. They're removed from this device once you send them.</p>
+        <button type="button" class="btn-quiet" id="clear">Clear my saved answers</button>
+        <div class="clear-confirm" id="clear-confirm" hidden>
+          <span>Delete everything you've written so far?</span>
+          <button type="button" class="btn-secondary" id="clear-yes">Yes, clear it</button>
+          <button type="button" class="btn-quiet" id="clear-no">Keep my answers</button>
+        </div>
+      </div>
+    </form>
+
+    <section id="thanks" hidden aria-labelledby="thanks-heading">
+      <h2 id="thanks-heading" tabindex="-1">Thank you</h2>
+      <p>Your answers have been sent. Thank you for taking the time to share your experience. It will help shape a building designed with you in mind, not just for you.</p>
+      <p>Your answers have also been cleared from this device.</p>
+      <div class="support">
+        <p>If any of these questions brought up something hard, you can talk with someone you trust, or call or text 9-8-8 any time to reach the Suicide Crisis Helpline in Canada.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>No cookies, analytics or trackers are used on this page. Answers are sent anonymously. Please leave names of people and places out of your answers.</p>
+  </footer>
+</div>
+
+<script>
+/* Paste your form backend link between the quotes (see SETUP.md).
+   Works with a Google Apps Script web app link or a Formspree link. */
+const FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbyxeIhmC9Zl03sc78jj1KgiMHHpCFVXz8wzEiwu52raFsiLPVwx3w_vdgfsE8yBioK1yw/exec";
+
+const DRAFT_KEY = "continuum-questionnaire-draft";
+const TEXT_KEY = "continuum-larger-text";
+
+const CONSENT = [
+  { id: "consent-age", text: "I've read the introduction above and I'm 18 or older." },
+  { id: "consent-quote", text: "My anonymous answers can be quoted in Josie's thesis." }
+];
+
+const SECTIONS = [
+  {
+    title: "Before you begin",
+    intro: "Please don't include names of people or places in your answers, so they stay anonymous. Every question is optional.",
+    consent: true
+  },
+  {
+    title: "Words and labels",
+    intro: "Words shape how spaces are named and how they feel to walk into.",
+    questions: [
+      { text: "When you describe yourself, what words do you use? Autistic, person with autism, neurodivergent, something else, or nothing at all? Why?" },
+      { text: "What words do you use for the moments when things become too much?" },
+      { text: "How do you feel about the word “meltdown”? Does it describe your experience, or does it feel like a word other people use about you?" },
+      { text: "Is there a difference for you between a meltdown, a shutdown, and burnout? How would you explain it to someone who has never felt it?" },
+      { text: "Which words used about autistic people bother you, and which feel validating or useful?",
+        hint: "For example: high/low functioning, support needs, special interests, disorder, sensory-friendly." },
+      { text: "If a building had a room for when you're overwhelmed, what would you want it called? Would a sign on the door help you find it, or make you not want to be seen using it?" }
+    ]
+  },
+  {
+    title: "Everyday spaces",
+    intro: "Think about real places you've been recently.",
+    questions: [
+      { text: "Tell me about the last time you left a place early, or didn't go at all, because of the space itself. What happened?" },
+      { text: "Are there places you avoid completely? What does avoiding them cost you?" },
+      { text: "Describe a place where you feel most like yourself. What about it makes that possible?" },
+      { text: "When you're out and need to recover, where do you go? What do you wish existed?" },
+      { text: "What have you changed at home to make it work better for you?" },
+      { text: "What do you do to prepare before going somewhere new? What do you wish a building told you before you arrived, or as soon as you walked in?" },
+      { text: "Is there a detail about light, sound, smell, temperature or layout that most people wouldn't notice but changes everything for you?" },
+      { text: "Does it matter to you to see an exit, see who's coming, or have your back to a wall? Tell me more." }
+    ]
+  },
+  {
+    title: "School spaces",
+    questions: [
+      { text: "Picture a classroom or school space that worked well for you, and one that didn't. What was physically different?" },
+      { text: "Where did you go during breaks, lunch or between classes? Was there anywhere you could get away to?" },
+      { text: "How did hallways, cafeterias, gyms or assemblies feel? Which was hardest, and why?" },
+      { text: "Were you ever given a separate space, like a resource room or quiet room? Did it help, or did it feel isolating or labelling?" }
+    ]
+  },
+  {
+    title: "Community",
+    questions: [
+      { text: "Where do you feel a sense of belonging right now?" },
+      { text: "What makes it easier or harder to join a group or go to an event for the first time?" },
+      { text: "Do you prefer spaces with other neurodivergent people, mixed spaces, or does it depend? Why?" },
+      { text: "Which spaces make you feel you have to mask the most, and which let you drop it? What's different about them?" },
+      { text: "What would make you go back to a community space week after week? What would make you stop going?" }
+    ]
+  },
+  {
+    title: "Into adulthood",
+    questions: [
+      { text: "What changed most when school ended: supports, routine, friendships, or something else?" },
+      { text: "Which adult tasks were harder than you expected, like appointments, banking, work, housing or transit? Where did they happen?" },
+      { text: "Was there a place or person that helped you through that time? What did they do right?" },
+      { text: "Looking back, what did you need at 18 to 21 that didn't exist?" },
+      { text: "What's still in the way of the life you want?" }
+    ]
+  },
+  {
+    title: "Last thoughts",
+    questions: [
+      { text: "What's one question you wish designers asked autistic people? How would you answer it?" },
+      { text: "Anything else you want me to know?" }
+    ]
+  }
+];
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (id) => document.getElementById(id);
+const stepsEl = $("steps");
+const fields = []; // { id, key, el }
+const consentBoxes = [];
+let current = 0;
+
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "text") node.textContent = v;
+    else node.setAttribute(k, v);
+  }
+  children.forEach((c) => c && node.append(c));
+  return node;
+}
+
+/* ---------- Storage (never required for the page to work) ---------- */
+function readStore(key) {
+  try { return window.localStorage.getItem(key); } catch (e) { return null; }
+}
+function writeStore(key, value) {
+  try { window.localStorage.setItem(key, value); } catch (e) { /* storage unavailable */ }
+}
+function removeStore(key) {
+  try { window.localStorage.removeItem(key); } catch (e) { /* storage unavailable */ }
+}
+
+/* ---------- Build the sections ---------- */
+SECTIONS.forEach((section, i) => {
+  const n = i + 1;
+  const heading = el("h2", { id: "h-" + n, tabindex: "-1", text: section.title });
+  const sec = el("section", { id: "step-" + n, "aria-labelledby": "h-" + n }, heading);
+  sec.hidden = true;
+  if (section.intro) sec.append(el("p", { class: "section-intro", text: section.intro }));
+
+  if (section.consent) {
+    const group = el("fieldset", { class: "consent", style: "border:0;padding:0;margin:1.5rem 0 0" },
+      el("legend", { class: "sr-only", text: "Consent" }));
+    CONSENT.forEach((c) => {
+      const box = el("input", { type: "checkbox", id: c.id });
+      consentBoxes.push({ box, text: c.text });
+      group.append(el("label", { class: "check", for: c.id }, box, el("span", { text: c.text })));
+    });
+    sec.append(group);
+  }
+
+  (section.questions || []).forEach((q, j) => {
+    const num = n + "." + (j + 1);
+    const id = "q-" + n + "-" + (j + 1);
+    const label = el("label", { for: id }, el("span", { class: "qnum", text: num }), document.createTextNode(q.text));
+    const attrs = { id, name: num + " " + q.text, rows: "4" };
+    let hint = null;
+    if (q.hint) {
+      hint = el("span", { class: "hint", id: id + "-hint", text: q.hint });
+      attrs["aria-describedby"] = id + "-hint";
+    }
+    const ta = el("textarea", attrs);
+    fields.push({ id, key: num + " " + q.text, el: ta });
+    sec.append(el("div", { class: "q" }, label, hint, ta));
+  });
+
+  stepsEl.append(sec);
+});
+
+/* ---------- Draft save / restore ---------- */
+let saveTimer = null;
+function saveDraft() {
+  const draft = { step: current, consent: consentBoxes.map((c) => c.box.checked), answers: {} };
+  fields.forEach((f) => { if (f.el.value) draft.answers[f.id] = f.el.value; });
+  writeStore(DRAFT_KEY, JSON.stringify(draft));
+}
+function queueSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveDraft, 400);
+}
+function restoreDraft() {
+  const raw = readStore(DRAFT_KEY);
+  if (!raw) return;
+  try {
+    const draft = JSON.parse(raw);
+    (draft.consent || []).forEach((v, i) => { if (consentBoxes[i]) consentBoxes[i].box.checked = !!v; });
+    fields.forEach((f) => { if (draft.answers && draft.answers[f.id]) f.el.value = draft.answers[f.id]; });
+    if (Number.isInteger(draft.step) && draft.step >= 0 && draft.step < SECTIONS.length && consentGiven()) {
+      current = draft.step;
+    }
+  } catch (e) { /* ignore a damaged draft */ }
+}
+
+/* ---------- Navigation ---------- */
+function consentGiven() { return consentBoxes.every((c) => c.box.checked); }
+
+function updateButtons() {
+  const ok = consentGiven();
+  const last = current === SECTIONS.length - 1;
+  $("next").disabled = !ok;
+  $("next").textContent = last ? "Send my answers" : "Next";
+  $("back").style.visibility = current === 0 ? "hidden" : "visible";
+  $("consent-note").hidden = ok;
+}
+
+function showStep(index, moveFocus) {
+  current = index;
+  SECTIONS.forEach((_, i) => { $("step-" + (i + 1)).hidden = i !== index; });
+  $("progress-text").textContent = "Section " + (index + 1) + " of " + SECTIONS.length;
+  $("progress-bar").style.width = ((index + 1) / SECTIONS.length * 100) + "%";
+  $("send-error").hidden = true;
+  updateButtons();
+  if (moveFocus) {
+    $("main").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    $("h-" + (index + 1)).focus({ preventScroll: true });
+  }
+}
+
+$("next").addEventListener("click", () => {
+  if (!consentGiven()) return;
+  if (current < SECTIONS.length - 1) {
+    showStep(current + 1, true);
+    saveDraft();
+  } else {
+    submit();
+  }
+});
+$("back").addEventListener("click", () => {
+  if (current > 0) { showStep(current - 1, true); saveDraft(); }
+});
+$("survey").addEventListener("submit", (e) => e.preventDefault());
+$("survey").addEventListener("input", queueSave);
+consentBoxes.forEach((c) => c.box.addEventListener("change", () => { updateButtons(); saveDraft(); }));
+
+/* ---------- Clear saved answers ---------- */
+$("clear").addEventListener("click", () => { $("clear-confirm").hidden = false; $("clear-yes").focus(); });
+$("clear-no").addEventListener("click", () => { $("clear-confirm").hidden = true; $("clear").focus(); });
+$("clear-yes").addEventListener("click", () => {
+  fields.forEach((f) => { f.el.value = ""; });
+  consentBoxes.forEach((c) => { c.box.checked = false; });
+  removeStore(DRAFT_KEY);
+  $("clear-confirm").hidden = true;
+  showStep(0, true);
+});
+
+/* ---------- Larger text ---------- */
+function setLargeText(on) {
+  document.documentElement.classList.toggle("large-text", on);
+  $("text-toggle").setAttribute("aria-pressed", on ? "true" : "false");
+}
+setLargeText(readStore(TEXT_KEY) === "1");
+$("text-toggle").addEventListener("click", () => {
+  const on = !document.documentElement.classList.contains("large-text");
+  setLargeText(on);
+  writeStore(TEXT_KEY, on ? "1" : "0");
+});
+
+/* ---------- Submitting ---------- */
+function buildPayload() {
+  const data = { _subject: "The Continuum: new anonymous response" };
+  consentBoxes.forEach((c) => { data["Consent: " + c.text] = c.box.checked ? "Yes" : "No"; });
+  fields.forEach((f) => { data[f.key] = f.el.value.trim() || "(skipped)"; });
+  return data;
+}
+
+function answersAsText() {
+  const data = buildPayload();
+  delete data._subject;
+  return Object.entries(data).map(([k, v]) => k + "\n" + v).join("\n\n");
+}
+
+async function send(payload) {
+  if (!/^https:\/\//.test(FORM_ENDPOINT)) throw new Error("Form backend link not set yet");
+  const formspree = FORM_ENDPOINT.includes("formspree.io");
+  const res = await fetch(FORM_ENDPOINT, {
+    method: "POST",
+    credentials: "omit",
+    referrerPolicy: "no-referrer",
+    headers: formspree
+      ? { "Content-Type": "application/json", "Accept": "application/json" }
+      : { "Content-Type": "text/plain;charset=utf-8" }, // plain text keeps Google Apps Script happy
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error("Server answered " + res.status);
+  const reply = await res.json().catch(() => ({}));
+  if (reply.ok === false || reply.result === "error") throw new Error("Server reported an error");
+}
+
+async function submit() {
+  const btn = $("next");
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  $("send-error").hidden = true;
+
+  const payload = buildPayload();
+  const honeypot = $("website").value;
+  try {
+    if (honeypot) {
+      // Bots fill hidden fields; pretend it worked and send nothing.
+    } else {
+      await send(payload);
+    }
+    removeStore(DRAFT_KEY);
+    $("survey").hidden = true;
+    $("thanks").hidden = false;
+    $("main").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    $("thanks-heading").focus({ preventScroll: true });
+  } catch (err) {
+    saveDraft();
+    $("send-error").hidden = false;
+    $("copy-status").textContent = "";
+    updateButtons();
+    $("retry").focus();
+  }
+}
+
+$("retry").addEventListener("click", submit);
+
+$("copy").addEventListener("click", async () => {
+  const text = answersAsText();
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(text);
+    copied = true;
+  } catch (e) {
+    const tmp = el("textarea", { "aria-hidden": "true", style: "position:fixed;top:0;left:0;opacity:0" });
+    tmp.value = text;
+    document.body.append(tmp);
+    tmp.select();
+    try { copied = document.execCommand("copy"); } catch (e2) { copied = false; }
+    tmp.remove();
+  }
+  $("copy-status").textContent = copied
+    ? "Copied. You can paste your answers somewhere safe."
+    : "Your browser blocked copying. Your answers are still saved on this device.";
+});
+
+/* ---------- Start ---------- */
+restoreDraft();
+showStep(current, false);
+</script>
+</body>
+</html>
